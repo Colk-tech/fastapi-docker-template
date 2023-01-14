@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Secrets
+secrets/
+
+# Playgrounds
+playground/
+*.playground.*

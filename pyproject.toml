@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "payment-service"
+version = "0.0.0"
+description = "A RESTAPI Service for payment constructed on FastAPI / FastAPI を使用したユーザー決済用の RESTAPI サービス"
+authors = ["ITO Manaki <colk@fingerpay.app>"]
+readme = "README.md"
+packages = [{include = "payment_service"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.89.1"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+fastapi-sqlalchemy = "^0.2.1"
+pydantic = {extras = ["email"], version = "^1.10.2"}
+alembic = "^1.8.1"
+sqlalchemy = "^1.4.44"
+psycopg2 = "^2.9.5"
+asyncpg = "^0.27.0"
+sqlalchemy-utils = "^0.39.0"
+firebase-admin = "^6.0.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
