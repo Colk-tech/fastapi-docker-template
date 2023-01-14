@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: ./docker/fastapi/Dockerfile
+    container_name: "payment-service-fastapi"
+    depends_on:
+      - "postgres"
+    ports:
+      - "8080:8000"
+    networks:
+      payment-service-docker-nw:
+        ipv4_address: 172.16.238.10
+    volumes:
+      - .:/deploy/payment-service
+      # .venv をマウントしないようにするために Volume として分離させる
+      - payment-service-fastapi-venv:/deploy/payment-service/.venv
+    environment:
+      FP_PAY_IS_DEBUG: ${FP_PAY_IS_DEBUG}
+      FP_PAY_MY_HOST: ${FP_PAY_MY_HOST}
+      FP_PAY_MY_WORKER_NAME: ${FP_PAY_MY_WORKER_NAME}
+      FP_PAY_DB_SYSTEM: ${FP_PAY_DB_SYSTEM}
+      FP_PAY_FIREBASE_KEY_PATH: ${FP_PAY_FIREBASE_KEY_PATH}
+      FP_PAY_JWT_SECRET: ${FP_PAY_JWT_SECRET}
+      FP_PAY_POSTGRES_HOST: ${FP_PAY_POSTGRES_HOST}
+      FP_PAY_POSTGRES_PORT: ${FP_PAY_POSTGRES_PORT}
+      FP_PAY_POSTGRES_USER_NAME: ${FP_PAY_POSTGRES_USER_NAME}
+      FP_PAY_POSTGRES_PASSWORD: ${FP_PAY_POSTGRES_PASSWORD}
+      FP_PAY_POSTGRES_DB_NAME: ${FP_PAY_POSTGRES_DB_NAME}
+    working_dir: /deploy/payment-service
+    entrypoint: >
+      bash ./wait_postgres.sh
+      ${FP_PAY_POSTGRES_USER_NAME} ${FP_PAY_POSTGRES_PASSWORD}
+      172.16.238.20 5432 ${FP_PAY_POSTGRES_DB_NAME}
+      "poetry run uvicorn api.main:app --host 0.0.0.0 --reload"
+    restart: unless-stopped
+    tty: true
+
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/postgres/Dockerfile
+    container_name: "payment-service-postgres"
+    environment:
+      POSTGRES_USER: ${FP_PAY_POSTGRES_USER_NAME}
+      POSTGRES_PASSWORD: ${FP_PAY_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${FP_PAY_POSTGRES_DB_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      payment-service-docker-nw:
+        ipv4_address: 172.16.238.20
+    volumes:
+      - payment-service-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    tty: true
+
+networks:
+  payment-service-docker-nw:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+        - subnet: 2001:3984:3989::/64
+
+volumes:
+  payment-service-postgres-data:
+    driver: local
+
+  payment-service-fastapi-venv:
+    driver: local
