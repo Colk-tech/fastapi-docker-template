@@ -4,7 +4,6 @@ version = "0.0.0"
 description = "A RESTAPI Service for payment constructed on FastAPI / FastAPI を使用したユーザー決済用の RESTAPI サービス"
 authors = ["ITO Manaki <colk@fingerpay.app>"]
 readme = "README.md"
-packages = [{include = "payment_service"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
