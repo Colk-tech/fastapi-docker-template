@@ -24,12 +24,12 @@ RUN pip install --upgrade pip \
     && pip install --upgrade setuptools \
     && pip install poetry
 
-RUN mkdir -p /deploy/auth-service
+RUN mkdir -p /deploy/payment-service
 
-WORKDIR /deploy/auth-service
+WORKDIR /deploy/payment-service
 
 COPY ./Pipfile* ./
 COPY ./pyproject.toml* poetry.lock* ./
 
-RUN poetry config virtualenvs.in-project true
-RUN if [ -f pyproject.toml ]; then poetry install; fi
+RUN poetry config virtualenvs.create false \
+    && if [ -f pyproject.toml ]; then poetry install; fi
